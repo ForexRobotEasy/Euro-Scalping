@@ -1,0 +1,138 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                              Euro Scalping.mq5   |
+//|                      https://www.forexroboteasy.com                |
+//|                        Developer: Forex Robot Easy Team             |
+//+------------------------------------------------------------------+
+
+//--- Constants
+#define TP_FACTOR 1.5     // Take Profit factor
+#define SL_FACTOR 1.2     // Stop Loss factor
+#define TRAILING_STOP 30  // Trailing Stop value in pips
+
+//--- Input parameters
+input double LotSize = 0.01;        // Lot size for each trade
+input int MaxTrades = 3;            // Maximum number of simultaneous trades
+input double SignificantLevel = 0.001; // Significant level criteria
+
+//--- Global variables
+int TotalTrades = 0;                // Total number of trades executed
+double TotalProfit = 0;             // Total profit earned
+double TotalLoss = 0;               // Total loss incurred
+
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    //--- Check if the broker is Roboforex
+    if (!IsBroker('Roboforex'))
+    {
+        Print('This advisor is optimized for Roboforex broker. Please adjust input parameters for other brokers.');
+        return INIT_FAILED;
+    }
+    
+    //--- Set up initial values
+    TotalTrades = 0;
+    TotalProfit = 0;
+    TotalLoss = 0;
+    
+    return INIT_SUCCEEDED;
+}
+
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    //--- Print advisor performance statistics
+    Print('Total trades executed: ', TotalTrades);
+    Print('Total profit earned: ', TotalProfit);
+    Print('Total loss incurred: ', TotalLoss);
+}
+
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    //--- Check if maximum number of trades is reached
+    if (TotalTrades >= MaxTrades)
+        return;
+    
+    //--- Check for significant levels
+    if (IsSignificantLevel())
+    {
+        //--- Open trade
+        if (OpenTrade())
+        {
+            TotalTrades++;
+        }
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Check if significant level is reached                            |
+//+------------------------------------------------------------------+
+bool IsSignificantLevel()
+{
+    //--- Logic to identify significant levels
+    //--- Insert your code here
+    
+    return true; // Replace with actual logic
+}
+
+//+------------------------------------------------------------------+
+//| Open trade function                                              |
+//+------------------------------------------------------------------+
+bool OpenTrade()
+{
+    //--- Calculate Take Profit and Stop Loss levels
+    double TakeProfit = Ask + (Ask - Bid) * TP_FACTOR;
+    double StopLoss = Bid - (Ask - Bid) * SL_FACTOR;
+    
+    //--- Open trade
+    if (OrderSend(Symbol(), OP_BUY, LotSize, Ask, 0, StopLoss, TakeProfit, 'Euro Scalping'))
+    {
+        //--- Set Trailing Stop
+        if (TrailingStop > 0)
+        {
+            double TrailingStart = Bid - TrailingStop * Point;
+            double TrailingStep = TrailingStop * Point;
+            TrailingStopByPoints(TakeProfit, TrailingStart, TrailingStep);
+        }
+        
+        return true;
+    }
+    
+    return false;
+}
+
+//+------------------------------------------------------------------+
+//| Trailing Stop function                                           |
+//+------------------------------------------------------------------+
+void TrailingStopByPoints(double TakeProfit, double TrailingStart, double TrailingStep)
+{
+    //--- Logic to implement trailing stop
+    //--- Insert your code here
+}
+
+//+------------------------------------------------------------------+
+//| Expert error handling function                                   |
+//+------------------------------------------------------------------+
+void OnTradeError(const int error)
+{
+    //--- Handle trade errors
+    //--- Insert your code here
+}
+
+//+------------------------------------------------------------------+
+//| Expert trade execution function                                  |
+//+------------------------------------------------------------------+
+void OnTrade()
+{
+    //--- Manage open trades
+    //--- Insert your code here
+}
+
+//+------------------------------------------------------------------+
